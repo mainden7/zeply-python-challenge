@@ -5,3 +5,4 @@ app.egg-info
 docker-stack.yml
 .env
 .idea/*
+alembic.ini
