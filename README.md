@@ -1,102 +1,66 @@
-# A generic, single database configuration.
+# Zeply Python Challenge
 
-[alembic]
-# path to migration scripts
-script_location = alembic
+## A simple web app to generate crypto wallets 
 
-# template used to generate migration files
-# file_template = %%(rev)s_%%(slug)s
+Tested on ubuntu 22.04
 
-# sys.path path, will be prepended to sys.path if present.
-# defaults to the current working directory.
-prepend_sys_path = .
+### Installation
 
-# timezone to use when rendering the date within the migration file
-# as well as the filename.
-# If specified, requires the python-dateutil library that can be
-# installed by adding `alembic[tz]` to the pip requirements
-# string value is passed to dateutil.tz.gettz()
-# leave blank for localtime
-# timezone =
+#### Prerequisites
 
-# max length of characters to apply to the
-# "slug" field
-# truncate_slug_length = 40
+Project requires >=python3.10, postgres >= 12
 
-# set to 'true' to run the environment during
-# the 'revision' command, regardless of autogenerate
-# revision_environment = false
+#### Project install
 
-# set to 'true' to allow .pyc and .pyo files without
-# a source .py file to be detected as revisions in the
-# versions/ directory
-# sourceless = false
+```bash
+$ git clone https://github.com/mainden7/zeply-python-challenge.git
+$ cd zeply-python-challenge
+$ poetry install
+```
 
-# version location specification; This defaults
-# to alembic/versions.  When using multiple version
-# directories, initial revisions must be specified with --version-path.
-# The path separator used here should be the separator specified by "version_path_separator" below.
-# version_locations = %(here)s/bar:%(here)s/bat:alembic/versions
+Rename and modify `alembic.example.ini` to `alembic.ini`
 
-# version path separator; As mentioned above, this is the character used to split
-# version_locations. The default within new alembic.ini files is "os", which uses os.pathsep.
-# If this key is omitted entirely, it falls back to the legacy behavior of splitting on spaces and/or commas.
-# Valid values for version_path_separator are:
-#
-# version_path_separator = :
-# version_path_separator = ;
-# version_path_separator = space
-version_path_separator = os  # Use os.pathsep. Default configuration used for new projects.
+Go to `zeply_python_challenge` dir and copy `.env.example` to `.env` and modify its content, i.e. set postgres connection
 
-# the output encoding used when revision files
-# are written from script.py.mako
-# output_encoding = utf-8
+```
+POSTGRES_SERVER=0.0.0.0
+POSTGRES_USER=test
+POSTGRES_PASSWORD=test
+POSTGRES_PORT=5432
+POSTGRES_DB=zeply
+```
+### Run app
 
-sqlalchemy.url = postgresql+psycopg2://test:test@0.0.0.0:5432/zeply
+First apply migrations. Assumed that you've already have up and running postgres database and alembic.ini is properly configured
 
+```bash
+$ alembic upgrade head
+```
 
-[post_write_hooks]
-# post_write_hooks defines scripts or Python functions that are run
-# on newly generated revision scripts.  See the documentation for further
-# detail and examples
+To run app use install uvicorn as a development server
 
-# format using "black" - use the console_scripts runner, against the "black" entrypoint
-# hooks = black
-# black.type = console_scripts
-# black.entrypoint = black
-# black.options = -l 79 REVISION_SCRIPT_FILENAME
+```bash
+$ uvicorn zeply_python_challenge.main:app
+```
 
-# Logging configuration
-[loggers]
-keys = root,sqlalchemy,alembic
+(Swagger)[localhost:8000/api/v1/docs] can be found here
 
-[handlers]
-keys = console
+### Run tests
 
-[formatters]
-keys = generic
+```bash
+$ pytest .
+```
 
-[logger_root]
-level = WARN
-handlers = console
-qualname =
+### TODO
 
-[logger_sqlalchemy]
-level = WARN
-handlers =
-qualname = sqlalchemy.engine
+This app is a simplified 4-5 hours of working project. In order to make it production ready need to improve some parts
+1. Align with HTTP errors returned and define a spec for error codes and messages
+2. Add better encryption
+3. To allow better user experience there should be some kind of auth with master key password encryption of returned user data
+4. Pagination with `next_url` would be a better choice
+5. Add specific interfaces for each crypto, rather than checking allowance in constants and relay on third-party
+6. To avoid security issues and leaks, define own lib to control and manipulate of crypto keys and others
 
-[logger_alembic]
-level = INFO
-handlers =
-qualname = alembic
+P.S. 
+Yeah I know postgres DB seems overkill here, but using async with sqlite3 or similar with single-threaded transaction engine isn't a better option. Also it may be better for `future` improvements, i.e. transactions, users, etc
 
-[handler_console]
-class = StreamHandler
-args = (sys.stderr,)
-level = NOTSET
-formatter = generic
-
-[formatter_generic]
-format = %(levelname)-5.5s [%(name)s] %(message)s
-datefmt = %H:%M:%S
