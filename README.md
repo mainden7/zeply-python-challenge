@@ -43,7 +43,7 @@ To run app use install uvicorn as a development server
 $ uvicorn zeply_python_challenge.main:app
 ```
 
-(Swagger)[localhost:8000/api/v1/docs] can be found here
+[Swagger](localhost:8000/api/v1/docs) can be found here
 
 ### Run tests
 
