@@ -9,6 +9,7 @@ from alembic import context
 from zeply_python_challenge.database import Base
 # add your model's MetaData object here
 # for 'autogenerate' support
+from zeply_python_challenge.wallets.models import *
 
 # target_metadata = mymodel.Base.metadata
 
